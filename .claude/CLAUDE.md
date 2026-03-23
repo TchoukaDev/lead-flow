@@ -10,21 +10,49 @@ Démo portfolio testable sans compte par des prospects.
 ## Stack
 
 - Next.js 14 App Router
-- Supabase (auth, database, storage)
-- Tailwind CSS
+- Supabase (auth, database) — nouveau système de clés depuis juin 2025 : `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` (ex-anon) et `SUPABASE_SECRET_KEY` (ex-service_role), format JWT legacy supprimé le 1er nov. 2025
+- Tailwind CSS v4 + shadcn/ui (dark mode, zinc)
 - TypeScript strict
-- n8n (orchestration webhooks)
+- n8n (orchestration webhooks) — accès via Route Handler sécurisé par `N8N_API_SECRET`, jamais accès direct Supabase
 - Claude API (enrichissement IA, scoring, brouillons email)
 - Resend (envoi emails)
+- Driver.js (tour onboarding)
 - Vercel (déploiement)
 
-## Périmètre v1
+## Variables d'environnement
 
-1. Formulaire public React → webhook n8n
-2. n8n → enrichissement IA + scoring + accusé de réception auto
-3. Interface admin : liste leads, fiche enrichie, statuts, brouillon email éditable
-4. Accès démo sans login (credentials pré-remplis)
-5. Base pré-remplie avec 10 leads fictifs réalistes
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+SUPABASE_SECRET_KEY
+N8N_WEBHOOK_URL
+N8N_API_SECRET
+RESEND_API_KEY
+RESEND_FROM_EMAIL
+```
+
+## Périmètre v1 — état d'avancement
+
+### Implémenté
+
+1. Setup : shadcn/ui, types (`Lead`, `LeadStatus`, `BudgetRange`, `Enrichment`, `LeadWebhookPayload`), variables d'env
+2. Supabase : table `leads` avec RLS + trigger `updated_at`, 9 leads démo, clients browser/server/service
+3. Auth : Server Actions `login`/`logout`, page `/login` avec `DemoButton` (compte démo `demo@leadflow.fr`), guard `/admin`
+4. Formulaire public : `submitLead` → POST n8n (succès simulé si URL absente), confirmation inline dans `LeadForm`, page `/formulaire`
+5. Landing page `/` : headline, pills features, `DemoButton` — plus de redirect automatique
+6. Tour onboarding : Driver.js, 5 étapes dans `lib/tour.ts`, auto-démarrage unique via `TourStarter`
+7. Interface admin — liste des leads :
+   - `app/admin/leads/page.tsx` — Server Component, fetch leads Supabase triés par date, header avec compteur + lien "Tester avec vos infos" vers `/formulaire`
+   - `components/admin/LeadsList.tsx` — Client Component, filtrage local par statut et recherche texte, table avec ids tour (`#leads-table`, `#lead-row-first`), navigation par `Link` Next.js (pas `router.push`)
+   - `components/admin/LeadsFilters.tsx` — Input recherche + pills statut (all/new/contacted/qualified/lost), compteur résultats
+   - `components/admin/ScoreBadge.tsx` — Badge score coloré : vert > 70, orange >= 40, rouge < 40, gris si null. Prop `id` pour ancre tour
+   - `components/admin/StatusBadge.tsx` — Badge statut avec labels FR (Nouveau/Contacté/Qualifié/Perdu). Prop `id` pour ancre tour
+   - `app/api/leads/route.ts` — Comparaison secret via `crypto.timingSafeEqual` (protection timing attack)
+
+### Restant
+
+- Interface admin : fiche enrichie, statuts, brouillon email éditable
+- Flux n8n : enrichissement IA + scoring + accusé de réception auto
 
 ## Conventions
 
@@ -37,9 +65,34 @@ Démo portfolio testable sans compte par des prospects.
 
 ## Structure des dossiers
 
-src/
-app/ ← pages et layouts
-components/ ← composants réutilisables
-lib/ ← utilitaires, clients Supabase, helpers
-types/ ← types TypeScript globaux
-actions/ ← server actions
+```
+app/          ← pages et layouts (racine, pas dans src/)
+  page.tsx          ← landing page
+  login/page.tsx    ← page démo (DemoButton uniquement)
+  formulaire/page.tsx ← formulaire public, sans guard
+  admin/            ← guard auth → redirect /login
+    layout.tsx
+    page.tsx        ← redirect /admin/leads
+    leads/          ← implémenté (page.tsx)
+components/
+  ui/           ← shadcn/ui
+  auth/         ← LoginForm, DemoButton
+  form/         ← LeadForm
+  tour/         ← TourStarter
+  admin/        ← LeadsList, LeadsFilters, ScoreBadge, StatusBadge
+lib/
+  supabase/
+    client.ts   ← createSupabaseBrowserClient()
+    server.ts   ← createSupabaseServerClient(cookieStore)
+    service.ts  ← getServiceClient()
+  tour.ts       ← tourSteps, TOUR_STORAGE_KEY (seul fichier à modifier pour le tour)
+  utils.ts
+types/
+  index.ts      ← Lead, LeadStatus, BudgetRange, Enrichment, LeadWebhookPayload
+actions/
+  auth.ts       ← login(formData), logout()
+  form.ts       ← submitLead(formData)
+supabase/
+  schema.sql
+  seed.sql
+```
