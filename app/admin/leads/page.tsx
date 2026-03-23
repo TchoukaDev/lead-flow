@@ -20,7 +20,7 @@ export default async function AdminLeadsPage() {
     <div className="min-h-screen bg-background">
       <TourStarter />
       <div className="container mx-auto px-4 py-8">
-        <header className="flex items-center justify-between mb-6">
+        <header className="flex flex-wrap items-start justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold">LeadFlow Admin</h1>
             <p className="text-muted-foreground text-sm mt-1">
@@ -30,7 +30,7 @@ export default async function AdminLeadsPage() {
           <Link
             href="/formulaire"
             id="create-lead-btn"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors shrink-0"
           >
             Tester avec vos infos →
           </Link>

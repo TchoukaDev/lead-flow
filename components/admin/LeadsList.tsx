@@ -44,7 +44,7 @@ export function LeadsList({ leads }: LeadsListProps) {
         filteredCount={filtered.length}
       />
 
-      <div id="leads-table">
+      <div id="leads-table" className="relative overflow-x-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-border">
         {filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-12 text-sm">
             Aucun lead ne correspond à votre recherche.
@@ -54,10 +54,10 @@ export function LeadsList({ leads }: LeadsListProps) {
             <thead>
               <tr className="border-b border-border text-left text-muted-foreground">
                 <th className="pb-3 pr-4 font-medium">Nom &amp; Société</th>
-                <th className="pb-3 pr-4 font-medium">Email</th>
+                <th className="pb-3 pr-4 font-medium hidden sm:table-cell">Email</th>
                 <th className="pb-3 pr-4 font-medium">Score</th>
                 <th className="pb-3 pr-4 font-medium">Statut</th>
-                <th className="pb-3 font-medium">Date</th>
+                <th className="pb-3 font-medium hidden sm:table-cell">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -75,7 +75,7 @@ export function LeadsList({ leads }: LeadsListProps) {
                       <div className="text-muted-foreground text-xs">{lead.company}</div>
                     </Link>
                   </td>
-                  <td className="py-3 pr-4">
+                  <td className="py-3 pr-4 hidden sm:table-cell">
                     <Link href={`/admin/leads/${lead.id}`} className="block text-muted-foreground">
                       {lead.email}
                     </Link>
@@ -96,7 +96,7 @@ export function LeadsList({ leads }: LeadsListProps) {
                       />
                     </Link>
                   </td>
-                  <td className="py-3">
+                  <td className="py-3 hidden sm:table-cell">
                     <Link href={`/admin/leads/${lead.id}`} className="block text-muted-foreground">
                       {formatDate(lead.created_at)}
                     </Link>
