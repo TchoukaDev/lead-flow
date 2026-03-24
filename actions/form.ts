@@ -20,8 +20,11 @@ export async function submitLead(formData: FormData) {
     return { success: true }
   }
 
+  const webhookSecret = process.env.N8N_WEBHOOK_SECRET
+  const url = webhookSecret ? `${webhookUrl}?secret=${webhookSecret}` : webhookUrl
+
   try {
-    const response = await fetch(webhookUrl, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
