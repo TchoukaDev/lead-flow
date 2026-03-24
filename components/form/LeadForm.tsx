@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { submitLead } from '@/actions/form'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import type { BudgetRange } from '@/types'
 
 const SECTORS = [
@@ -72,9 +73,9 @@ export function LeadForm() {
           Vous recevrez un accusé de réception par email dans quelques instants.
           Notre équipe vous recontactera rapidement.
         </p>
-        <Button asChild className="mt-6">
-          <Link href="/admin/leads">Voir le panneau d&apos;administration</Link>
-        </Button>
+        <Link href="/admin/leads" className={cn(buttonVariants(), 'mt-6')}>
+          Voir le panneau d&apos;administration
+        </Link>
       </div>
     )
   }
