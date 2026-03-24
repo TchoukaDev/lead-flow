@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { submitLead } from '@/actions/form'
 import { Button } from '@/components/ui/button'
 import type { BudgetRange } from '@/types'
@@ -71,6 +72,9 @@ export function LeadForm() {
           Vous recevrez un accusé de réception par email dans quelques instants.
           Notre équipe vous recontactera rapidement.
         </p>
+        <Button asChild className="mt-6">
+          <Link href="/admin/leads">Voir le panneau d&apos;administration</Link>
+        </Button>
       </div>
     )
   }
