@@ -12,6 +12,16 @@ export default function TourStarter() {
     const driverObj = driver({
       allowClose: true,
       showProgress: true,
+      onHighlightStarted: (element) => {
+        if (element instanceof HTMLElement) {
+          element.style.pointerEvents = 'none'
+        }
+      },
+      onDeselected: (element) => {
+        if (element instanceof HTMLElement) {
+          element.style.pointerEvents = ''
+        }
+      },
       steps: tourSteps,
       onDestroyStarted: () => {
         localStorage.setItem(TOUR_STORAGE_KEY, '1')
