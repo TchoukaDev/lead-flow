@@ -21,12 +21,14 @@ export async function submitLead(formData: FormData) {
   }
 
   const webhookSecret = process.env.N8N_WEBHOOK_SECRET
-  const url = webhookSecret ? `${webhookUrl}?secret=${webhookSecret}` : webhookUrl
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(webhookUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(webhookSecret ? { 'x-webhook-secret': webhookSecret } : {}),
+      },
       body: JSON.stringify(payload),
     })
 
