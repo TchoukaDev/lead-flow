@@ -44,14 +44,22 @@ RESEND_FROM_EMAIL
 7. Interface admin — liste des leads :
    - `app/admin/leads/page.tsx` — Server Component, fetch leads Supabase triés par date, header avec compteur + lien "Tester avec vos infos" vers `/formulaire`
    - `components/admin/LeadsList.tsx` — Client Component, filtrage local par statut et recherche texte, table avec ids tour (`#leads-table`, `#lead-row-first`), navigation par `Link` Next.js (pas `router.push`)
-   - `components/admin/LeadsFilters.tsx` — Input recherche + pills statut (all/new/contacted/qualified/lost), compteur résultats
+   - `components/admin/LeadsFilters.tsx` — Input recherche + pills statut avec `statusCounts: Record<LeadStatus | 'all', number>`. Les counts reflètent la recherche active (calculés sur `searchFiltered` avant filtre statut)
    - `components/admin/ScoreBadge.tsx` — Badge score coloré : vert > 70, orange >= 40, rouge < 40, gris si null. Prop `id` pour ancre tour
    - `components/admin/StatusBadge.tsx` — Badge statut avec labels FR (Nouveau/Contacté/Qualifié/Perdu). Prop `id` pour ancre tour
    - `app/api/leads/route.ts` — Comparaison secret via `crypto.timingSafeEqual` (protection timing attack)
+8. Interface admin — fiche lead :
+   - `app/admin/leads/[id]/page.tsx` — Server Component, fetch lead par id, sections : infos, enrichissement IA, brouillon email
+   - `components/admin/StatusSelect.tsx` — Select statut inline, appelle `updateLeadStatus` (Server Action), optimistic via `defaultValue`
+   - `components/admin/EmailDraftEditor.tsx` — Textarea + boutons Sauvegarder / Envoyer. Sauvegarder → `updateEmailDraft`. Envoyer → POST `/api/send-email` → Resend + statut → contacted
+   - `components/admin/EnrichmentPanel.tsx` — Affichage lecture seule des données `Enrichment` (résumé, points forts, risques)
+   - `app/api/send-email/route.ts` — Auth Supabase, envoi Resend (text pour l'instant, TODO react-email), update statut → contacted via service client, `revalidatePath` sur liste + fiche
+   - `actions/leads.ts` — `updateLeadStatus(id, status)` + `updateEmailDraft(id, draft)`, revalidatePath après chaque mutation
+9. Tests : Vitest + Testing Library, 83 tests unitaires dans `__tests__/`
+10. Docs : README.md + `.claude/docs/` (auth, public-form, admin-leads-list, admin-lead-detail)
 
 ### Restant
 
-- Interface admin : fiche enrichie, statuts, brouillon email éditable
 - Flux n8n : enrichissement IA + scoring + accusé de réception auto
 
 ## Conventions
@@ -79,7 +87,7 @@ components/
   auth/         ← LoginForm, DemoButton
   form/         ← LeadForm
   tour/         ← TourStarter
-  admin/        ← LeadsList, LeadsFilters, ScoreBadge, StatusBadge
+  admin/        ← LeadsList, LeadsFilters, ScoreBadge, StatusBadge, StatusSelect, EmailDraftEditor, EnrichmentPanel
 lib/
   supabase/
     client.ts   ← createSupabaseBrowserClient()
@@ -92,6 +100,10 @@ types/
 actions/
   auth.ts       ← login(formData), logout()
   form.ts       ← submitLead(formData)
+  leads.ts      ← updateLeadStatus(id, status), updateEmailDraft(id, draft)
+__tests__/      ← Vitest, miroir de la structure source
+  actions/leads.test.ts
+  components/admin/*.test.tsx
 supabase/
   schema.sql
   seed.sql
