@@ -7,8 +7,7 @@ interface LeadsFiltersProps {
   onSearchChange: (v: string) => void
   statusFilter: LeadStatus | 'all'
   onStatusFilterChange: (v: LeadStatus | 'all') => void
-  totalCount: number
-  filteredCount: number
+  statusCounts: Record<LeadStatus | 'all', number>
 }
 
 const STATUS_OPTIONS: { value: LeadStatus | 'all'; label: string }[] = [
@@ -24,8 +23,7 @@ export function LeadsFilters({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
-  totalCount,
-  filteredCount: _filteredCount,
+  statusCounts,
 }: LeadsFiltersProps) {
   return (
     <div className="space-y-3 mb-4">
@@ -40,10 +38,6 @@ export function LeadsFilters({
       <div className="flex flex-wrap gap-2">
         {STATUS_OPTIONS.map((option) => {
           const isActive = statusFilter === option.value
-          const label =
-            option.value === 'all'
-              ? `Tous (${totalCount})`
-              : option.label
           return (
             <button
               key={option.value}
@@ -54,7 +48,7 @@ export function LeadsFilters({
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
-              {label}
+              {option.label} ({statusCounts[option.value]})
             </button>
           )
         })}

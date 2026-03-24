@@ -22,16 +22,27 @@ export function LeadsList({ leads }: LeadsListProps) {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all')
 
-  const filtered = leads.filter((lead) => {
-    const matchStatus = statusFilter === 'all' || lead.status === statusFilter
+  const searchFiltered = leads.filter((lead) => {
     const q = search.toLowerCase()
-    const matchSearch =
+    return (
       !q ||
       `${lead.first_name} ${lead.last_name}`.toLowerCase().includes(q) ||
       lead.company.toLowerCase().includes(q) ||
       lead.email.toLowerCase().includes(q)
-    return matchStatus && matchSearch
+    )
   })
+
+  const statusCounts: Record<LeadStatus | 'all', number> = {
+    all: searchFiltered.length,
+    new: searchFiltered.filter((l) => l.status === 'new').length,
+    contacted: searchFiltered.filter((l) => l.status === 'contacted').length,
+    qualified: searchFiltered.filter((l) => l.status === 'qualified').length,
+    lost: searchFiltered.filter((l) => l.status === 'lost').length,
+  }
+
+  const filtered = searchFiltered.filter(
+    (lead) => statusFilter === 'all' || lead.status === statusFilter
+  )
 
   return (
     <div>
@@ -40,8 +51,7 @@ export function LeadsList({ leads }: LeadsListProps) {
         onSearchChange={setSearch}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
-        totalCount={leads.length}
-        filteredCount={filtered.length}
+        statusCounts={statusCounts}
       />
 
       <div id="leads-table" className="relative overflow-x-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-border">
