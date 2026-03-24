@@ -18,7 +18,7 @@ const makeLead = (overrides: Partial<Lead>): Lead => ({
   company: 'Acme',
   sector: 'Tech',
   main_need: 'CRM',
-  budget_range: '5k-10k',
+  budget_range: '5k-15k',
   status: 'new',
   score: 80,
   source: null,
@@ -26,6 +26,7 @@ const makeLead = (overrides: Partial<Lead>): Lead => ({
   email_draft: null,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+  is_demo: false,
   ...overrides,
 })
 
