@@ -28,8 +28,6 @@ export async function submitLead(formData: FormData) {
     })
 
     if (!response.ok) {
-      const body = await response.text().catch(() => '(unreadable)')
-      console.error('[submitLead] n8n error', { status: response.status, body })
       return { error: 'Une erreur est survenue. Veuillez réessayer.' }
     }
 
