@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { Lead, Enrichment } from '@/types'
 import { ScoreBadge } from '@/components/admin/ScoreBadge'
-import { StatusBadge } from '@/components/admin/StatusBadge'
 import { EnrichmentPanel } from '@/components/admin/EnrichmentPanel'
+import { StatusSelect } from '@/components/admin/StatusSelect'
+import { EmailDraftEditor } from '@/components/admin/EmailDraftEditor'
 
 interface LeadDetailPageProps {
   params: Promise<{ id: string }>
@@ -47,7 +48,7 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
               {lead.first_name} {lead.last_name}
             </h1>
             <ScoreBadge score={lead.score} />
-            <StatusBadge status={lead.status} />
+            <StatusSelect leadId={lead.id} currentStatus={lead.status} />
           </div>
         </header>
 
@@ -108,7 +109,18 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
           )}
         </section>
 
-        {/* EmailDraftEditor — étape 7b */}
+        <section className="mb-8">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+            Brouillon email
+          </h2>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <EmailDraftEditor
+              leadId={lead.id}
+              leadEmail={lead.email}
+              initialDraft={lead.email_draft}
+            />
+          </div>
+        </section>
       </div>
     </div>
   )
