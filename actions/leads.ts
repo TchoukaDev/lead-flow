@@ -5,10 +5,16 @@ import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { LeadStatus } from '@/types'
 
+const VALID_STATUSES: LeadStatus[] = ['new', 'contacted', 'qualified', 'lost']
+
 export async function updateLeadStatus(
   id: string,
   status: LeadStatus
 ): Promise<{ ok: true } | { error: string }> {
+  if (!VALID_STATUSES.includes(status)) {
+    return { error: 'Invalid status' }
+  }
+
   const cookieStore = await cookies()
   const supabase = createSupabaseServerClient(cookieStore)
 

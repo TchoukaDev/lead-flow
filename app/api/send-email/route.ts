@@ -35,18 +35,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  const sanitizedSubject = subject.replace(/[\r\n\0]/g, '')
+
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   // TODO: remplacer `text` par `react: <LeadContactEmail ... />` quand le template sera créé
   const { error: sendError } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to,
-    subject,
+    subject: sanitizedSubject,
     text: emailBody,
   })
 
   if (sendError) {
-    return NextResponse.json({ error: sendError.message }, { status: 500 })
+    console.error('[send-email] Resend error:', sendError)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 
   const { error: updateError } = await getServiceClient()
@@ -55,7 +58,8 @@ export async function POST(request: Request) {
     .eq('id', leadId)
 
   if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 })
+    console.error('[send-email] Supabase update error:', updateError)
+    return NextResponse.json({ error: 'Failed to update lead status' }, { status: 500 })
   }
 
   revalidatePath('/admin/leads')

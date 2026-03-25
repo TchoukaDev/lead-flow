@@ -8,7 +8,7 @@ export const tourSteps: DriveStep[] = [
     popover: {
       title: 'Votre pipeline de leads',
       description:
-        "8 leads ont été automatiquement capturés, enrichis et scorés par l'IA.",
+        "Des leads ont été automatiquement capturés, enrichis et scorés par l'IA. Ils apparaissent ici",
     },
   },
   {

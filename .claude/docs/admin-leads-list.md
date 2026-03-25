@@ -74,7 +74,11 @@ Même prop `id` optionnelle que ScoreBadge pour le tour (`id="status-badge"`).
 
 ### Déclenchement
 
-`TourStarter` est un Client Component qui rend `null` et utilise uniquement `useEffect`. Il démarre le tour si `localStorage.getItem('leadflow_tour_done')` est falsy. A la fermeture (quel que soit le mode — bouton Fermer ou fin du tour), il écrit `'1'` dans localStorage via le callback `onDestroyStarted`.
+`TourStarter` est un Client Component qui rend `null` et utilise uniquement `useEffect`. Il démarre le tour si `localStorage.getItem('leadflow_tour_done')` est falsy. A la fin du tour, il écrit `'1'` dans localStorage via le callback `onDestroyStarted`.
+
+Configuration Driver.js notable :
+- `allowClose: false` — l'utilisateur ne peut pas fermer le tour manuellement (bouton ×) ; il doit le compléter
+- `disableActiveInteraction: true` — les éléments mis en surbrillance ne sont pas cliquables pendant le tour (évite les navigations accidentelles)
 
 Le tour ne se déclenche donc qu'une seule fois par navigateur, a la premiere visite de `/admin/leads`.
 

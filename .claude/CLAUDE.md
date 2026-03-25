@@ -26,6 +26,7 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 SUPABASE_SECRET_KEY
 N8N_WEBHOOK_URL
+N8N_WEBHOOK_SECRET
 N8N_API_SECRET
 RESEND_API_KEY
 RESEND_FROM_EMAIL
@@ -55,12 +56,13 @@ RESEND_FROM_EMAIL
    - `components/admin/EnrichmentPanel.tsx` — Affichage lecture seule des données `Enrichment` (résumé, points forts, risques)
    - `app/api/send-email/route.ts` — Auth Supabase, envoi Resend (text pour l'instant, TODO react-email), update statut → contacted via service client, `revalidatePath` sur liste + fiche
    - `actions/leads.ts` — `updateLeadStatus(id, status)` + `updateEmailDraft(id, draft)`, revalidatePath après chaque mutation
-9. Tests : Vitest + Testing Library, 83 tests unitaires dans `__tests__/`
-10. Docs : README.md + `.claude/docs/` (auth, public-form, admin-leads-list, admin-lead-detail)
+9. Flux n8n : workflow "workflow leadflow" (id: hyaw1eQfOCpDuEzp) — Webhook → Claude Sonnet (score + enrichment + email_draft) → `/api/leads` → Resend accusé de réception. Webhook sécurisé par Header Auth n8n (`x-webhook-secret`).
+10. Tests : Vitest + Testing Library, 83 tests unitaires dans `__tests__/`
+11. Docs : README.md + `.claude/docs/` (auth, public-form, admin-leads-list, admin-lead-detail)
 
 ### Restant
 
-- Flux n8n : enrichissement IA + scoring + accusé de réception auto
+- (rien)
 
 ## Conventions
 

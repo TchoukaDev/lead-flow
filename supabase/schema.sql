@@ -53,3 +53,7 @@ CREATE POLICY "Auth users can update leads"
 
 -- INSERT réservé au service_role (via API Route sécurisée)
 -- Pas de policy INSERT pour anon/authenticated
+
+-- DELETE intentionnellement interdit pour authenticated et anon
+-- Seul le service_role peut supprimer (migration SQL directe uniquement)
+-- Comportement par défaut Supabase quand RLS est activé sans policy DELETE : accès refusé

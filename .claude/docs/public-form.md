@@ -23,9 +23,11 @@ LeadForm (client)
   → appelle submitLead(formData) (Server Action)
     → si N8N_WEBHOOK_URL absent : logue en console, retourne { success: true }
     → sinon : POST JSON vers N8N_WEBHOOK_URL
+      → header x-webhook-secret: N8N_WEBHOOK_SECRET (si défini)
       → succès (2xx) : retourne { success: true }
       → échec réseau ou HTTP : retourne { error: string }
   → si succès : bascule sur l'écran de confirmation inline
+    → affiche un lien "Voir le panneau d'administration" → /admin/leads
   → si erreur : affiche le message dans le formulaire
 ```
 
@@ -76,7 +78,15 @@ n8n (après enrichissement IA)
 }
 ```
 
-## Sécurité de l'API Route
+## Sécurité
+
+### Webhook n8n (formulaire → n8n)
+
+Le webhook n8n est protégé par un secret partagé (`N8N_WEBHOOK_SECRET`) transmis dans le header `x-webhook-secret`. Côté n8n, le nœud Webhook est configuré en **Header Auth** — les requêtes sans ce header sont rejetées avant l'exécution du workflow.
+
+Si `N8N_WEBHOOK_SECRET` n'est pas défini dans l'environnement, le header n'est pas envoyé — s'assurer qu'il est défini en production sur Vercel.
+
+### API Route `/api/leads` (n8n → app)
 
 La route `POST /api/leads` est appelée par n8n, pas par le navigateur. Elle est protégée par un secret partagé (`N8N_API_SECRET`) transmis dans le header `x-api-secret`.
 
